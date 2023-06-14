@@ -1,0 +1,7 @@
+.gutter {
+  background-color: #eee;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+}

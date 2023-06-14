@@ -1,0 +1,33 @@
+const defaultParameters = [
+  { item: 'RAD', name: 'Радиус шара', defaultValue: 1.25, isInteger: false },
+  { item: 'ALPHA', name: 'ALPHA', defaultValue: 0.02, isInteger: false },
+  { item: 'PROP', name: 'Коэф проп', defaultValue: 0.7, isInteger: false },
+  { item: 'VS', name: 'Скорость', defaultValue: 7.5, isInteger: false },
+  { item: 'HDELO', name: 'HDELO', defaultValue: 2.0e-4, isInteger: false },
+  { item: 'DE', name: 'DE', defaultValue: 0.008, isInteger: false },
+  { item: 'MAT', name: 'Материал', defaultValue: 1, isInteger: true },
+  { item: 'KPOVT', name: 'KPOVT', defaultValue: 1, isInteger: true },
+  { item: 'EPXA', name: 'Точность вычислений EPXA', defaultValue: 5.0e-2, isInteger: false },
+  { item: 'EPRA', name: 'Точность вычислений EPRA', defaultValue: 5.0e-2, isInteger: false },
+  { item: 'EPG', name: 'Точность вычислений EPG', defaultValue: 50.0, isInteger: false },
+  { item: 'EPS', name: 'Точность вычислений EPS', defaultValue: 1.0e-3, isInteger: false },
+  { item: 'APL', name: 'APL', defaultValue: 100.0, isInteger: false },
+  { item: 'BPLM', name: 'BPLM', defaultValue: 40.0, isInteger: false },
+  { item: 'BPLB', name: 'BPLB', defaultValue: 20.0, isInteger: false },
+  { item: 'HPL', name: 'HPL', defaultValue: 4.0, isInteger: false },
+  { item: 'QPL', name: 'QPL', defaultValue: 0.51, isInteger: false },
+  { item: 'CSTEK', name: 'CSTEK', defaultValue: 2.0, isInteger: false },
+  { item: 'DSTEK', name: 'Пред приращ предела тек', defaultValue: 20.0, isInteger: false },
+  { item: 'CRAST', name: 'CRAST', defaultValue: 1.0, isInteger: false },
+  { item: 'PLOTN', name: 'PLOTN', defaultValue: 7.0e3, isInteger: false },
+  { item: 'NX1', name: 'Число узлов сетки NX1', defaultValue: 51, isInteger: true },
+  { item: 'NZ1', name: 'Число узлов сетки NZ1', defaultValue: 61, isInteger: true },
+  { item: 'JSUX', name: 'JSUX', defaultValue: 0, isInteger: true },
+  { item: 'LCIO', name: 'LCIO', defaultValue: 41, isInteger: true },
+  { item: 'H', name: 'H', defaultValue: 0.02, isInteger: false },
+  { item: 'TAU', name: 'TAU', defaultValue: 1.0, isInteger: false },
+  { item: 'V', name: 'Коэф Пуассона', defaultValue: 0.3, isInteger: false },
+  { item: 'STEKO', name: 'STEKO', defaultValue: 156.0, isInteger: false }
+] as const
+
+export default defaultParameters
