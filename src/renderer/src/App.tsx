@@ -67,6 +67,7 @@ function App(): JSX.Element {
           if (!newData.didParametersEnd) {
             if (line === 'PARAMETERS END') {
               newData.didParametersEnd = true
+              window.api.sendToSubprocess(7)
             }
             continue
           }
@@ -125,7 +126,7 @@ function App(): JSX.Element {
         <div>
           <Button onClick={handleStartSubprocess}>Старт</Button>
           {data.didParametersEnd && (
-            <Button onClick={() => window.api.sendToSubprocess(7)}>Результат</Button>
+            <Button onClick={() => window.api.sendToSubprocess(7)}>Продолжить</Button>
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/*
+  - resources/generated/*
 afterSign: build/notarize.js
 win:
   executableName: prognoz-electron

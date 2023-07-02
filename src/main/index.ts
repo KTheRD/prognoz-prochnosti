@@ -2,8 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { IPty, spawn } from 'node-pty'
-import prognozLin from '../../resources-generated/prognoz?asset'
-import prognozWin from '../../resources-generated/prognoz.exe?asset'
+import prognozLin from '../../resources/generated/prognoz?asset&asarUnpack'
+import prognozWin from '../../resources/generated/prognoz.exe?asset&asarUnpack'
 
 const prognoz = process.platform === 'win32' ? prognozWin : prognozLin
 
@@ -60,7 +60,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../render/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
 
