@@ -6,13 +6,44 @@ import defaultParameters from './defaultParameters'
 import Split from 'react-split'
 import styles from './App.module.css'
 import './gutter-styles.css'
+import { DataSet } from 'vis-data'
+import { graphNames, point } from './graphs'
+import Graph from './components/graph'
 
 const emptyData = {
   didParametersEnd: false,
   isPrintingGraphs: false,
-  graphs: '',
+  rawGraphs: [] as string[],
+  graphs: null as null | DataSet<point>[],
   otherOutput: '',
   isWaiting: false
+}
+
+const parseGraphs = (rawGraphs: string[]) => {
+  let i = 0
+  let id = 0
+  const graphs = [] as DataSet<point>[]
+
+  console.log(rawGraphs)
+  for (let j = 0; j < graphNames.length; j++) {
+    graphs.push(new DataSet<point>())
+    const x = rawGraphs[i].split(' ').map(Number)
+    i++
+    while (rawGraphs[i] !== '//') {
+      const [y, ...z] = rawGraphs[i].split(' ').map(Number)
+      z.forEach((z, k) =>
+        graphs[graphs.length - 1].add({
+          id: id++,
+          x: x[k],
+          y: y,
+          z: z
+        })
+      )
+      i++
+    }
+    i++
+  }
+  return graphs
 }
 
 function App(): JSX.Element {
@@ -51,15 +82,16 @@ function App(): JSX.Element {
           }
           if (line === 'BEGIN PECH') {
             newData.isPrintingGraphs = true
-            newData.graphs = ''
+            newData.rawGraphs = []
             continue
           }
           if (newData.isPrintingGraphs) {
             if (line === 'END PECH') {
               newData.isPrintingGraphs = false
+              newData.graphs = parseGraphs(newData.rawGraphs)
               continue
             }
-            newData.graphs += `${line}\n`
+            newData.rawGraphs.push(line)
             continue
           }
           newData.otherOutput += `${line}\n`
@@ -91,9 +123,9 @@ function App(): JSX.Element {
           }}
         />
         <div>
-          <Button onClick={handleStartSubprocess}>Start</Button>
+          <Button onClick={handleStartSubprocess}>Старт</Button>
           {data.didParametersEnd && (
-            <Button onClick={() => window.api.sendToSubprocess(7)}>000</Button>
+            <Button onClick={() => window.api.sendToSubprocess(7)}>Результат</Button>
           )}
         </div>
       </div>
@@ -104,8 +136,14 @@ function App(): JSX.Element {
           ))}
         </ul>
         <ul>
-          {data.graphs.split('\n').map((line) => (
-            <li>{line.split(/\s+/).join(' ')}</li>
+          {/* {data.rawGraphs.map((line) => ( */}
+          {/*   <li>{line.split(/\s+/).join(' ')}</li> */}
+          {/* ))} */}
+          {data.graphs?.map((data, i) => (
+            <li>
+              {graphNames[i]}:
+              <Graph data={data} />
+            </li>
           ))}
         </ul>
       </div>

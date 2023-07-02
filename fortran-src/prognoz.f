@@ -292,37 +292,53 @@
          IF(JK.GT.NZ1) JK=NZ1
          WRITE(*,*) "BEGIN PECH"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=1,12)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=NO,JK)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=1,12)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=NO,JK)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=1,12)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=NO,JK)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=1,12)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=NO,JK)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=1,12)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=NO,JK)
+         WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(SINT(I,J),I=1,37,2),
      ;   J=1,JK,2)
+         WRITE(*,*) "//"
          IF(JSUX.EQ.1) GOTO 1
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(W(I,J,9),I=1,37,2),
      ;   J=1,JK,2)
     1    CONTINUE
+         WRITE(*,*) "//"
          WRITE (*,33) (X(I),I=1,37,2),(Z(J),(U(I,J,7),I=1,37,2),
      ;   J=1,JKO)
+         WRITE(*,*) "//"
          WRITE (*,33) (X(I),I=1,37,2),(Z(J),(W(I,J,7),I=1,37,2),
      ;   J=1,JKO)
+         WRITE(*,*) "//"
          WRITE (*,33) (X(I),I=1,37,2),(Z(J),(W(I,J,8),I=1,37,2),
      ;   J=1,JKO)
+         WRITE(*,*) "//"
          WRITE (*,33) (X(I),I=1,37,2),(Z(J),(U(I,J,8),I=1,37,2),
      ;   J=1,JKO)
+         WRITE(*,*) "END GRAPH"
          DO 118 J=1,JKO
             WRITE (*,119) Z(J),(SOST(I,J),I=1,4)
   118    CONTINUE
