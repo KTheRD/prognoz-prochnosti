@@ -13,4 +13,4 @@ export const graphNames = [
   'Средние остаточные напряжения [кгс/мм2]'
 ]
 
-export type point = {id:number, x: number; y: number; z: number }
+export type point = { id: number; x: number; y: number; z: number }

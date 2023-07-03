@@ -13,7 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "npm run typecheck https://tmpfiles.org/1642306/prognoz-electron-1.0.0-setup.exe&& electron-vite build",
+    "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "compileforlinux": "gfortran ./fortran-src/prognoz.f -o ./resources/generated/prognoz -std=legacy",
     "compileforwindows": "x86_64-w64-mingw32-gfortran ./fortran-src/prognoz.f -o ./resources/generated/prognoz.exe -std=legacy",

@@ -7,5 +7,5 @@ contextBridge.exposeInMainWorld('api', {
   onData: (callback: (e: IpcRendererEvent, ...args: any) => void) =>
     void ipcRenderer.on('data', callback),
   removeDataListener: () => void ipcRenderer.removeAllListeners('data'),
-  sendToSubprocess: (data:number) => ipcRenderer.send('writeToSubprocess', data),
+  sendToSubprocess: (data: number) => ipcRenderer.send('writeToSubprocess', data)
 })
