@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { IpcRendererEvent } from 'electron'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ParametersForm from './components/form'
 import defaultParameters from './defaultParameters'
 import Split from 'react-split'
@@ -10,97 +10,116 @@ import { DataSet } from 'vis-data'
 import { graphNames, point } from './graphs'
 import Graph from './components/graph'
 
-const emptyData = {
-  didParametersEnd: false,
-  isPrintingGraphs: false,
-  rawGraphs: [] as string[],
-  graphs: null as null | DataSet<point>[],
-  otherOutput: '',
-  isWaiting: false
-}
-
-const parseGraphs = (rawGraphs: string[]) => {
-  let i = 0
+const createGraphDataSet = (rawData: string[]) => {
   let id = 0
-  const graphs = [] as DataSet<point>[]
-
-  console.log(rawGraphs)
-  for (let j = 0; j < graphNames.length; j++) {
-    graphs.push(new DataSet<point>())
-    const x = rawGraphs[i].split(' ').map(Number)
-    i++
-    while (rawGraphs[i] !== '//') {
-      const [y, ...z] = rawGraphs[i].split(' ').map(Number)
-      z.forEach((z, k) =>
-        graphs[graphs.length - 1].add({
-          id: id++,
-          x: x[k],
-          y: y,
-          z: z
-        })
-      )
-      i++
+  const dataSet = new DataSet<point>()
+  const x = rawData[0].split(' ').map(Number)
+  for (let i = 1; i < rawData.length; i++) {
+    const [y, ...z] = rawData[i].split(' ').map(Number)
+    for (let k = 0; k < z.length; k++) {
+      dataSet.add({
+        id: id++,
+        x: x[k],
+        y: y,
+        z: z[k]
+      })
     }
-    i++
   }
-  return graphs
+  return dataSet
 }
 
 function App(): JSX.Element {
-  const [data, setData] = useState(emptyData)
+  const [dataBeforeGraphs, setDataBeforeGraphs] = useState([] as string[])
+  const [graphs, setGraphs] = useState([] as DataSet<point>[])
+  const [dataAfterGraphs, setDataAfterGraphs] = useState([] as string[])
+  const [waiting, setWaiting] = useState(false)
+
+  //wiping only graphs and data after the graphs
+  const cleanData = () => {
+    // setDataBeforeGraphs([])
+    setDataAfterGraphs([])
+    setGraphs([])
+  }
+
+  const incomingData = useRef({
+    dataQueue: '', // Queue to store the accumulated raw data
+    promise: null as null | Promise<void>, // Promise resolves by event handler to signal that new data is ready
+    resolve: null as null | (() => void) // Resolve function for the promise above
+  })
+
+  const dataStream = useRef(null as null | ReturnType<typeof dataStreamGenerator>)
+
+  async function* dataStreamGenerator() {
+    while (true) {
+      const data = incomingData.current.dataQueue
+        .split('\n')
+        .filter((s) => s !== '')
+        .map((line) => line.trim())
+      incomingData.current.dataQueue = ''
+      for (const s of data) yield s
+      if (!incomingData.current.dataQueue) await incomingData.current.promise // Await the signal from the event handler that new data is ready if it didn't arrive while generator was yielding old data
+    }
+  }
+
+  const parseData = async (dataStream: ReturnType<typeof dataStreamGenerator>) => {
+    while ((await dataStream.next()).value !== 'PARAMETERS END') {}
+
+    while (true) {
+      const currentChunk = await dataStream.next()
+      if (currentChunk.done) return
+      if (currentChunk.value === 'WAIT') break
+      setDataBeforeGraphs((data) => [...data, currentChunk.value])
+    }
+
+    while (true) {
+      setWaiting(true)
+      if ((await dataStream.next()).value !== '7') return //check if signal was outputted properly
+      setWaiting(false)
+      cleanData()
+      while (true) {
+        const currentChunk = await dataStream.next()
+        if (currentChunk.done) return
+        if (currentChunk.value === 'BEGIN GRAPH') break
+        setDataBeforeGraphs((data) => [...data, currentChunk.value])
+      }
+
+      for (const _ of graphNames) {
+        const graphData = [] as string[]
+        while (true) {
+          const currentChunk = await dataStream.next()
+          if (currentChunk.done) return
+          if (currentChunk.value === '//') break
+          graphData.push(currentChunk.value)
+        }
+        setGraphs((graphs) => [...graphs, createGraphDataSet(graphData)])
+      }
+
+      while (true) {
+        const currentChunk = await dataStream.next()
+        if (currentChunk.done) return
+        if (currentChunk.value === 'WAIT') break
+        setDataAfterGraphs((data) => [...data, currentChunk.value])
+      }
+    }
+  }
 
   const handleStartSubprocess = () => {
-    setData(emptyData)
+    // wipe ALL data
+    setDataBeforeGraphs([])
+    cleanData()
+    dataStream.current?.return()
+    dataStream.current = dataStreamGenerator()
+    parseData(dataStream.current)
     window.api.startPrognozSubprocess(parameters.map(Number))
   }
 
   useEffect(() => {
-    window.api.onData((_: IpcRendererEvent, rawNewData: string) =>
-      setData((oldData) => {
-        const rawDataArr = rawNewData
-          .split('\n')
-          .filter(Boolean)
-          .map((line) => line.trim())
-        const newData = { ...oldData }
-
-        for (let line of rawDataArr) {
-          if (!newData.didParametersEnd) {
-            if (line === 'PARAMETERS END') {
-              newData.didParametersEnd = true
-              window.api.sendToSubprocess(7)
-            }
-            continue
-          }
-          if (newData.isWaiting) {
-            if (line === 'OK') {
-              newData.isWaiting = false
-            }
-            continue
-          }
-          if (line === 'WAIT') {
-            newData.isWaiting = true
-            continue
-          }
-          if (line === 'BEGIN PECH') {
-            newData.isPrintingGraphs = true
-            newData.rawGraphs = []
-            continue
-          }
-          if (newData.isPrintingGraphs) {
-            if (line === 'END PECH') {
-              newData.isPrintingGraphs = false
-              newData.graphs = parseGraphs(newData.rawGraphs)
-              continue
-            }
-            newData.rawGraphs.push(line)
-            continue
-          }
-          newData.otherOutput += `${line}\n`
-        }
-
-        return newData
-      })
-    )
+    incomingData.current.promise = new Promise((r) => (incomingData.current.resolve = r)) //setting up the first that resolves on the first onData event
+    window.api.onData((_: IpcRendererEvent, rawNewData: string) => {
+      incomingData.current.dataQueue += rawNewData
+      if (incomingData.current.resolve) incomingData.current.resolve() // Resolve the previous promise to indicate new data is available
+      incomingData.current.promise = new Promise((r) => (incomingData.current.resolve = r)) // Create a new promise for the next data
+    })
     return window.api.removeDataListener
   }, [])
 
@@ -125,26 +144,28 @@ function App(): JSX.Element {
         />
         <div>
           <Button onClick={handleStartSubprocess}>Старт</Button>
-          {data.didParametersEnd && (
-            <Button onClick={() => window.api.sendToSubprocess(7)}>Продолжить</Button>
-          )}
+          {waiting && <Button onClick={() => window.api.sendToSubprocess(7)}>Продолжить</Button>}
         </div>
       </div>
       <div className={styles.column}>
         <ul>
-          {data.otherOutput.split('\n').map((line) => (
-            <li>{line.split(/\s+/).join(' ')}</li>
+          {dataBeforeGraphs.map((line) => (
+            <li>{line}</li>
           ))}
         </ul>
+        ======================
         <ul>
-          {/* {data.rawGraphs.map((line) => ( */}
-          {/*   <li>{line.split(/\s+/).join(' ')}</li> */}
-          {/* ))} */}
-          {data.graphs?.map((data, i) => (
+          {graphs?.map((data, i) => (
             <li>
               {graphNames[i]}:
               <Graph data={data} />
             </li>
+          ))}
+        </ul>
+        ======================
+        <ul>
+          {dataAfterGraphs.map((line) => (
+            <li>{line}</li>
           ))}
         </ul>
       </div>

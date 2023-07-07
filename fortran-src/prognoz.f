@@ -241,7 +241,6 @@
             IF(KPOVT*(LCI/KPOVT).LT.LCI) GOTO 214
             WRITE (*,*) "WAIT"
             READ 219, J
-            WRITE (*,*) "OK"
   219       FORMAT (I1)
             IF(J.EQ.7) GOTO 213
             IF(J.EQ.4) STOP
@@ -290,7 +289,7 @@
          NO=JN-9
          JK=JN+6
          IF(JK.GT.NZ1) JK=NZ1
-         WRITE(*,*) "BEGIN PECH"
+         WRITE (*,*) "BEGIN GRAPH"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=1,12)
          WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=NO,JK)
@@ -338,11 +337,10 @@
          WRITE(*,*) "//"
          WRITE (*,33) (X(I),I=1,37,2),(Z(J),(U(I,J,8),I=1,37,2),
      ;   J=1,JKO)
-         WRITE(*,*) "END GRAPH"
+         WRITE(*,*) "//"
          DO 118 J=1,JKO
             WRITE (*,119) Z(J),(SOST(I,J),I=1,4)
   118    CONTINUE
-         WRITE (*,*) "END PECH"
          RETURN
       END
       SUBROUTINE NOST(L,M,PAR1,PAR2,IKO,JKO,H)
