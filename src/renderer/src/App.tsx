@@ -1,14 +1,13 @@
-import { Button } from '@mui/material'
 import { IpcRendererEvent } from 'electron'
 import { useEffect, useRef, useState } from 'react'
-import ParametersForm from './components/form'
 import defaultParameters from './defaultParameters'
 import Split from 'react-split'
 import styles from './App.module.css'
 import './gutter-styles.css'
 import { DataSet } from 'vis-data'
 import { graphNames, point } from './graphs'
-import Graph from './components/graph'
+import ControlColumn from './components/controlColumn'
+import DataColumn from './components/dataColumn'
 
 const createGraphDataSet = (rawData: string[]) => {
   let id = 0
@@ -28,7 +27,7 @@ const createGraphDataSet = (rawData: string[]) => {
   return dataSet
 }
 
-function App(): JSX.Element {
+function App() {
   const [dataBeforeGraphs, setDataBeforeGraphs] = useState([] as string[])
   const [graphs, setGraphs] = useState([] as DataSet<point>[])
   const [dataAfterGraphs, setDataAfterGraphs] = useState([] as string[])
@@ -41,12 +40,14 @@ function App(): JSX.Element {
     setGraphs([])
   }
 
+  // this object is used to accamulate new unprocessed data and signal generator that to emit it to parsing function
   const incomingData = useRef({
     dataQueue: '', // Queue to store the accumulated raw data
     promise: null as null | Promise<void>, // Promise resolves by event handler to signal that new data is ready
     resolve: null as null | (() => void) // Resolve function for the promise above
   })
 
+  //current generator that yeilds data is stored here, every time fortran program is restarted, a new generator is created to stop the old parsing function and run the new one
   const dataStream = useRef(null as null | ReturnType<typeof dataStreamGenerator>)
 
   async function* dataStreamGenerator() {
@@ -57,13 +58,15 @@ function App(): JSX.Element {
         .map((line) => line.trim())
       incomingData.current.dataQueue = ''
       for (const s of data) yield s
-      if (!incomingData.current.dataQueue) await incomingData.current.promise // Await the signal from the event handler that new data is ready if it didn't arrive while generator was yielding old data
+      if (!incomingData.current.dataQueue) await incomingData.current.promise
     }
   }
 
   const parseData = async (dataStream: ReturnType<typeof dataStreamGenerator>) => {
+    //first the program just gives us parameters we sent, we don't need them obviously
     while ((await dataStream.next()).value !== 'PARAMETERS END') {}
 
+    //first part of data, that prints before the graphs
     while (true) {
       const currentChunk = await dataStream.next()
       if (currentChunk.done) return
@@ -73,9 +76,11 @@ function App(): JSX.Element {
 
     while (true) {
       setWaiting(true)
-      if ((await dataStream.next()).value !== '7') return //check if signal was outputted properly
+      if ((await dataStream.next()).value !== '7') return //check if signal was outputted properly, probably works and the check superfluous
       setWaiting(false)
       cleanData()
+
+      //looks like nothing is printed here, probably does nothing and should be removed
       while (true) {
         const currentChunk = await dataStream.next()
         if (currentChunk.done) return
@@ -107,6 +112,7 @@ function App(): JSX.Element {
     // wipe ALL data
     setDataBeforeGraphs([])
     cleanData()
+
     dataStream.current?.return()
     dataStream.current = dataStreamGenerator()
     parseData(dataStream.current)
@@ -133,42 +139,19 @@ function App(): JSX.Element {
 
   return (
     <Split className={styles.split} gutterSize={5}>
-      <div className={styles.column}>
-        <ParametersForm
-          {...{
-            parameters,
-            setParameters,
-            good: areParametersGood,
-            setGood: setAreParametersGood
-          }}
-        />
-        <div>
-          <Button onClick={handleStartSubprocess}>Старт</Button>
-          {waiting && <Button onClick={() => window.api.sendToSubprocess(7)}>Продолжить</Button>}
-        </div>
-      </div>
-      <div className={styles.column}>
-        <ul>
-          {dataBeforeGraphs.map((line) => (
-            <li>{line}</li>
-          ))}
-        </ul>
-        ======================
-        <ul>
-          {graphs?.map((data, i) => (
-            <li>
-              {graphNames[i]}:
-              <Graph data={data} />
-            </li>
-          ))}
-        </ul>
-        ======================
-        <ul>
-          {dataAfterGraphs.map((line) => (
-            <li>{line}</li>
-          ))}
-        </ul>
-      </div>
+      <ControlColumn
+        parameters={parameters}
+        setParameters={setParameters}
+        areParametersGood={areParametersGood}
+        setAreParametersGood={setAreParametersGood}
+        handleStartSubprocess={handleStartSubprocess}
+        waiting={waiting}
+      />
+      <DataColumn
+        dataBeforeGraphs={dataBeforeGraphs}
+        dataAfterGraphs={dataAfterGraphs}
+        graphs={graphs}
+      />
     </Split>
   )
 }

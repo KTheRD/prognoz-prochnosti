@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { Graph3d } from 'vis-graph3d'
 import { DataSet } from 'vis-data'
 
-const Graph = ({ data }: { data: DataSet<point> }) => {
+function Graph({ data }: { data: DataSet<point> }) {
   const graphDiv = useRef(null)
   const options = {
     width: '600px',
@@ -15,10 +15,19 @@ const Graph = ({ data }: { data: DataSet<point> }) => {
     keepAspectRatio: true,
     verticalRatio: 0.5
   }
+  
+  const graph = useRef(null as null | any)
 
   useEffect(() => {
-    new Graph3d(graphDiv.current, data, options)
-  })
+    graph.current = new Graph3d(graphDiv.current, data, options)
+  }, [])
+
+  useEffect(() => {
+    if (graph.current) {
+      graph.current.setData(data)
+      graph.current.redraw()
+    }
+  }, [data])
 
   return <div ref={graphDiv} />
 }

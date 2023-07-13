@@ -1,11 +1,3 @@
-# prognoz-electron
-
-An Electron application with React and TypeScript
-
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
 ## Project Setup
 
 ### Install
@@ -13,6 +5,13 @@ An Electron application with React and TypeScript
 ```bash
 $ npm install
 ```
+
+### Compilation
+Before running the app, you need to compile fortran program.
+```bash
+npm run compileall
+```
+Windows compilation is broken currently, compile prognoz.f with gfrotran and put an exe into ```./resources/generated/```
 
 ### Development
 

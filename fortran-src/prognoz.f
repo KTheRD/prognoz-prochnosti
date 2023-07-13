@@ -291,30 +291,30 @@
          IF(JK.GT.NZ1) JK=NZ1
          WRITE (*,*) "BEGIN GRAPH"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=1,12)
-         WRITE(*,*) "//"
+         ! WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,19),(Z(J),(G(I,J),I=1,19),J=NO,JK)
          WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=1,12)
-         WRITE(*,*) "//"
+         ! WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=NO,JK)
          WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=1,12)
-         WRITE(*,*) "//"
+         ! WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,3),I=1,37,2),
      ;   J=NO,JK)
          WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=1,12)
-         WRITE(*,*) "//"
+         ! WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=NO,JK)
          WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=1,12)
-         WRITE(*,*) "//"
+         ! WRITE(*,*) "//"
          WRITE (*,42) (X(I),I=1,37,2),(Z(J),(U(I,J,4),I=1,37,2),
      ;   J=NO,JK)
          WRITE(*,*) "//"

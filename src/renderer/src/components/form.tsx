@@ -13,10 +13,10 @@ function ParametersForm({
   good: boolean[]
   setGood: React.Dispatch<React.SetStateAction<typeof good>>
 }) {
-  function verificationHandle(good: boolean, id: number) {
+  function verificationHandle(isGood: boolean, id: number) {
     setGood((oldGood) => {
       const newGood = [...oldGood]
-      newGood[id] = good
+      newGood[id] = isGood
       return newGood
     })
   }
@@ -33,6 +33,7 @@ function ParametersForm({
     <div className={styles.container}>
       {defaultParameters.map((p, i) => (
         <ParameterInput
+          key = {i}
           good={good[i]}
           verificationHandle={verificationHandle}
           name={p.name}
