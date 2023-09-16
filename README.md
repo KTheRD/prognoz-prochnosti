@@ -11,7 +11,7 @@ Before running the app, you need to compile fortran program.
 ```bash
 npm run compileall
 ```
-Windows compilation should work, but if it is broken, compile prognoz.f with gfrotran and put an exe into ```./resources/generated/```
+On windows app is broken for some reasons. I'll fix it later.
 
 ### Development
 
